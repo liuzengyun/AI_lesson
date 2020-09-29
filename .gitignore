@@ -2,8 +2,8 @@
 /shelf/
 /workspace.xml
 # Datasource local storage ignored files
-/../../../../../../:\Users\lance\Desktop\AI_lesson\.idea/dataSources/
+/../../../../../../:\Users\lance\Desktop\AI\.idea/dataSources/
 /dataSources.local.xml
 # 基于编辑器的 HTTP 客户端请求
 /httpRequests/
-/.idea
+.idea/
