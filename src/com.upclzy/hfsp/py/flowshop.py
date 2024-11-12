@@ -22,7 +22,7 @@ def read_file(file_name):
     data_csv = pd.read_csv(file_name, header=None)  # 假设没有标题行
     rows = data_csv.values.tolist()
 
-    gl = -1  # 初始化，表示未找到实例行
+    gl = -1  # 初始化，未找到实例行
     num_process = 0
     num_job = 0
     data_new = None
