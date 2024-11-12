@@ -3,6 +3,7 @@ import numpy as np, pandas as pd
 import time
 import copy
 import os
+import pandas as pd
 
 # 设置超参
 parser = argparse.ArgumentParser()
@@ -15,28 +16,32 @@ parser.add_argument('--num_mutation_jobs', default=2, type=float)
 parser.add_argument('--iteration', default=100, type=int)
 
 
+
+
 def read_file(file_name):
-    data_csv = pd.read_csv(file_name)  #读取文件内容
-    data = data_csv.iloc[:, :].values.tolist() #将txt文件内容除第一行以外一行一行放进list中
-    gl = 0           #初始化
+    data_csv = pd.read_csv(file_name, header=None)  # 假设没有标题行
+    rows = data_csv.values.tolist()
+
+    gl = -1  # 初始化，表示未找到实例行
     num_process = 0
     num_job = 0
-    global data_new  #操作全局的data_new
-    # 根据输入，读取规定的instance的数据
-    for i, data in enumerate(data):
-        data = str(data[0]).split()  #取data其中一行将内容分开 存在data中
-        if data[0] == "instance" and int(data[1]) == 1:  #判断是否为例子num
-            gl = i         #记录例子第一行层数
-        if i == gl + 1:  #进入例子第二行
-            num_job = int(data[0]) #例job个数
-            num_process = int(data[1]) #工序数
-            data_new = np.zeros(shape=(num_job, num_process))  #创建与例子一样行列的全零矩阵，以存新数据
-        if i > gl + 1 and i < gl + num_job + 2:  #圈定例子中数据的循环位置，进入数据
-            for j in range(0, num_process):
-                data_new[i - gl - 2][j] = int(data[j])  #将数据放进data_new
-    data = data_new.tolist()
+    data_new = None
 
-    return data, num_process, num_job #返回例子数据 行数，列数
+    for i, row in enumerate(rows):
+        row_str = ' '.join(map(str, row))  # 将行转换为字符串，方便分割
+        data = row_str.split()
+
+        if data[0] == "instance" and int(data[1]) == 1:
+            gl = i
+        elif i == gl + 1:
+            num_job = int(data[0])
+            num_process = int(data[1])
+            data_new = [[0] * num_process for _ in range(num_job)]  # 使用列表推导式创建二维列表
+        elif gl != -1 and i > gl + 1 and i < gl + num_job + 2:
+            for j in range(num_process):
+                data_new[i - gl - 2][j] = int(data[j])
+
+    return data_new, num_process, num_job
 
 #交叉 返回变换结束和变换之前的
 def crossover(population_list, population, crossover_rate, num_job):
